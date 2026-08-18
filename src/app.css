@@ -1,0 +1,97 @@
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-serif/latin-600.css";
+@import "@fontsource/ibm-plex-serif/latin-400-italic.css";
+@import "@fontsource/lilex/latin-400.css";
+@import "@fontsource/lilex/latin-700.css";
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: false;
+}
+
+@plugin "daisyui/theme" {
+    name: "zed-light";
+    default: true;
+    color-scheme: light;
+    --color-base-100: #fdfdfc;
+    --color-base-200: #f6f5f2;
+    --color-base-300: #dedcd4;
+    --color-base-content: #2c3037;
+    --color-primary: #1348dc;
+    --color-primary-content: #fdfdfc;
+    --color-secondary: #727a89;
+    --color-secondary-content: #fdfdfc;
+    --color-accent: #1348dc;
+    --color-accent-content: #fdfdfc;
+    --color-neutral: #2c3037;
+    --color-neutral-content: #f6f5f2;
+    --color-info: #1348dc;
+    --color-success: #3d9a57;
+    --color-warning: #c88b2e;
+    --color-error: #e05d44;
+    --radius-box: 0.625rem;
+    --radius-field: 0.375rem;
+    --radius-selector: 0.375rem;
+    --border: 0.0625rem;
+}
+
+@plugin "daisyui/theme" {
+    name: "zed";
+    prefersdark: true;
+    color-scheme: dark;
+    --color-base-100: hsl(218 13% 10%);
+    --color-base-200: hsl(218 13% 7.5%);
+    --color-base-300: hsl(218 13% 16%);
+    --color-base-content: #c9cdd5;
+    --color-primary: #54a2ff;
+    --color-primary-content: hsl(218 13% 7.5%);
+    --color-secondary: #8a919e;
+    --color-secondary-content: hsl(218 13% 7.5%);
+    --color-accent: #54a2ff;
+    --color-accent-content: hsl(218 13% 7.5%);
+    --color-neutral: #c9cdd5;
+    --color-neutral-content: hsl(218 13% 7.5%);
+    --color-info: #54a2ff;
+    --color-success: #3d9a57;
+    --color-warning: #c88b2e;
+    --color-error: #e05d44;
+    --radius-box: 0.625rem;
+    --radius-field: 0.375rem;
+    --radius-selector: 0.375rem;
+    --border: 0.0625rem;
+}
+
+@theme {
+    --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-serif: "IBM Plex Serif", Georgia, serif;
+    --font-mono: "Lilex", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+    body {
+        background-color: var(--color-base-200);
+    }
+
+    code {
+        font-family: var(--font-mono);
+        font-size: 0.84em;
+    }
+}
+
+@layer utilities {
+    .label-caps {
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        font-weight: 700;
+    }
+
+    .dotgrid {
+        background-image: radial-gradient(
+            color-mix(in oklab, var(--color-base-content) 13%, transparent) 0.0625rem,
+            transparent 0.0625rem
+        );
+        background-size: 1.125rem 1.125rem;
+    }
+}
