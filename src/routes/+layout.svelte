@@ -31,7 +31,7 @@
       Unofficial project, not affiliated with Zed Industries, Inc.
       Logo and fonts per the <a class="link link-primary" href="https://zed.dev/brand">Zed brand guidelines</a>.
     </p>
-    <div class="mt-3 flex items-center justify-between">
+    <div class="mt-3 flex items-center justify-center gap-3">
       <a class="transition-colors hover:text-primary" href={REPO} aria-label="GitHub repository">
         <Icon icon={githubIcon} class="size-5" />
       </a>

@@ -10,6 +10,7 @@
   }
 
   const WIDTH = 360
+  const HEIGHT = 70
   const PADDING = 14
   const LOGO_SIZE = 32
   const TEXT_X = PADDING + LOGO_SIZE + 12
@@ -35,7 +36,7 @@
   const autoCss = $derived(
     `${rules(cardThemes.light)}@media(prefers-color-scheme:dark){${rules(cardThemes.dark)}}`,
   )
-  const height = $derived(meta ? 70 : 56)
+  const dy = $derived(meta ? 0 : 7)
   const shownTitle = $derived(clip(title, 26))
   const shownDesc = $derived(desc ? clip(desc, 44) : "")
   const shownMeta = $derived(meta ? clip(meta, 40) : "")
@@ -60,18 +61,18 @@
   )
 </script>
 
-<svg xmlns="http://www.w3.org/2000/svg" width={WIDTH} {height} role="img" aria-label={label}>
+<svg xmlns="http://www.w3.org/2000/svg" width={WIDTH} height={HEIGHT} role="img" aria-label={label}>
   <title>{label}</title>
   {#if auto}
     <svelte:element this={"style"}>{autoCss}</svelte:element>
   {/if}
-  <rect class="bg" width={WIDTH} {height} rx="8" fill={t.background} />
+  <rect class="bg" width={WIDTH} height={HEIGHT} rx="8" fill={t.background} />
   <rect
     class="frame"
     x="0.5"
     y="0.5"
     width={WIDTH - 1}
-    height={height - 1}
+    height={HEIGHT - 1}
     rx="7.5"
     fill="none"
     stroke={t.border}
@@ -80,7 +81,7 @@
     icon={zedLogo}
     class="logo"
     x={PADDING}
-    y={(height - LOGO_SIZE) / 2}
+    y={(HEIGHT - LOGO_SIZE) / 2}
     width={LOGO_SIZE}
     height={LOGO_SIZE}
     color={auto ? undefined : t.logo}
@@ -88,7 +89,7 @@
   <text
     class="title"
     x={TEXT_X}
-    y="24"
+    y={24 + dy}
     font-family={fontStack}
     font-size="14.5"
     font-weight="700"
@@ -100,7 +101,7 @@
     <text
       class="accent"
       x={WIDTH - PADDING - 18}
-      y="24"
+      y={24 + dy}
       font-family={fontStack}
       font-size="12.5"
       font-weight="600"
@@ -113,14 +114,14 @@
       icon={downloadIcon}
       class="icon"
       x={WIDTH - PADDING - 13}
-      y="13"
+      y={13 + dy}
       width="13"
       height="13"
       color={auto ? undefined : t.subtle}
     />
   {/if}
   {#if shownSegments}
-    <text x={TEXT_X} y="43.5" font-family={fontStack} font-size="12">
+    <text x={TEXT_X} y={43.5 + dy} font-family={fontStack} font-size="12">
       <tspan class="subtle" fill={t.subtle}>{shownSegments.prefix}</tspan>
       <tspan class="accent" font-weight="700" fill={t.accent}>{shownSegments.strong}</tspan>
       <tspan class="subtle" fill={t.subtle}>{shownSegments.suffix}</tspan>
@@ -129,7 +130,7 @@
     <text
       class={descColor ? undefined : "subtle"}
       x={TEXT_X}
-      y="43.5"
+      y={43.5 + dy}
       font-family={fontStack}
       font-size="12"
       fill={descColor ?? t.subtle}
