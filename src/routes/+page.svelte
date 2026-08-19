@@ -23,6 +23,12 @@
     return () => clearTimeout(timer)
   })
 
+  const selectMode = (value: string) => {
+    mode = value
+    query = ""
+    debounced = ""
+  }
+
   let form = $state({
     style: "",
     theme: "",
@@ -155,7 +161,7 @@
         class="btn h-16 flex-col gap-1 border-base-300 bg-base-100 text-[0.62rem] label-caps
           {mode === m.value ? 'btn-outline btn-primary' : 'btn-ghost border'}"
         aria-pressed={mode === m.value}
-        onclick={() => (mode = m.value)}
+        onclick={() => selectMode(m.value)}
       >
         <Icon icon={m.icon} class="size-5" />
         {m.label}
