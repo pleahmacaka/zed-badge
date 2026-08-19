@@ -77,6 +77,13 @@
         font-family: var(--font-mono);
         font-size: 0.84em;
     }
+
+    :not(pre) > code {
+        background-color: var(--color-base-100);
+        border: 0.0625rem solid var(--color-base-300);
+        border-radius: 0.25rem;
+        padding: 0.0625rem 0.3125rem;
+    }
 }
 
 @layer utilities {

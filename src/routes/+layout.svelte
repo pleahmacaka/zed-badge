@@ -26,7 +26,7 @@
   {@render children()}
 
   <footer class="mt-16 border-t border-base-300 pt-4 text-sm text-secondary">
-    <p>
+    <p class="text-center text-sm">
       Data: <a class="link link-primary" href="https://api.zed.dev/extensions">api.zed.dev</a>.
       Unofficial project, not affiliated with Zed Industries, Inc.
       Logo and fonts per the <a class="link link-primary" href="https://zed.dev/brand">Zed brand guidelines</a>.
