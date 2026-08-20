@@ -8,5 +8,13 @@
     "directory": ".svelte-kit/cloudflare"
   },
   "routes": [{ "pattern": "zedbadge.dev", "custom_domain": true }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zed-badge",
+      "database_id": "db562d52-a80e-4531-b74d-6645882adb4b",
+      "migrations_dir": "migrations"
+    }
+  ],
   "observability": { "enabled": true }
 }

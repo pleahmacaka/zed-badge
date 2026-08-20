@@ -1,21 +1,24 @@
 import { json } from "@sveltejs/kit"
-import { humanize, segments, withCommas, wrap } from "$lib/format"
+import { humanize, template, withCommas } from "$lib/format"
 import {
+  extensionCard,
+  imageFormat,
+  imageResponse,
   jsonError,
   parseOpts,
   statusSvg,
   stripExt,
-  svgResponse,
   validSubject,
 } from "$lib/server/badge"
 import { cardSvg } from "$lib/server/card"
 import { cacheHeader } from "$lib/server/env"
 import { flatSvg } from "$lib/server/flat"
-import { displayName, lookup } from "$lib/server/zed"
+import { lookup } from "$lib/server/zed"
 import type { RequestHandler } from "./$types"
 
 export const GET: RequestHandler = async ({ params, url }) => {
-  const wantSvg = params.file.endsWith(".svg")
+  const wantJson = params.file.endsWith(".json")
+  const format = imageFormat(params.file)
   const id = stripExt(params.file)
   if (!validSubject(id)) {
     return jsonError("bad extension id", 400)
@@ -25,7 +28,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
   const cacheControl = cacheHeader()
   const ext = await lookup(id)
 
-  if (!wantSvg) {
+  if (wantJson) {
     if (ext === "error") {
       return jsonError("upstream unavailable", 502)
     }
@@ -42,14 +45,16 @@ export const GET: RequestHandler = async ({ params, url }) => {
   }
 
   if (ext === "error") {
-    return svgResponse(
+    return imageResponse(
       statusSvg("unavailable", opts, "downloads", id),
+      format,
       "no-cache",
     )
   }
   if (!ext) {
-    return svgResponse(
+    return imageResponse(
       statusSvg("missing", opts, "downloads", id),
+      format,
       cacheControl,
     )
   }
@@ -59,32 +64,24 @@ export const GET: RequestHandler = async ({ params, url }) => {
     ? withCommas(ext.download_count)
     : humanize(ext.download_count)
   const value = isVersion ? `v${ext.version}` : count
+  const rendered = opts.desc
+    ? template(opts.desc, { downloads: count, version: `v${ext.version}` })
+    : undefined
 
   if (opts.flat) {
     const label = opts.label ?? (isVersion ? "zed extension" : "downloads")
+    const message = rendered
+      ? "text" in rendered
+        ? rendered.text
+        : rendered.prefix + rendered.strong + rendered.suffix
+      : value
 
-    return svgResponse(
-      flatSvg(
-        label,
-        wrap(opts.prefix, value, opts.suffix),
-        opts.color,
-        opts.logo,
-      ),
+    return imageResponse(
+      flatSvg(label, message, opts.color, opts.logo),
+      format,
       cacheControl,
     )
   }
 
-  const descSegments = segments(opts.prefix, value, opts.suffix)
-
-  return svgResponse(
-    cardSvg({
-      title: opts.label ?? ext.name,
-      right: value,
-      desc: descSegments ? undefined : ext.description,
-      descSegments,
-      meta: ext.authors?.map(displayName).join(", "),
-      theme: opts.theme,
-    }),
-    cacheControl,
-  )
+  return imageResponse(cardSvg(extensionCard(ext, opts)), format, cacheControl)
 }

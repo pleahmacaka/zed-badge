@@ -1,7 +1,10 @@
 import { json } from "@sveltejs/kit"
-import { cleanText } from "$lib/format"
+import type { CardProps } from "$lib/components/Card.svelte"
+import { cleanText, humanize, template, withCommas } from "$lib/format"
 import { cardSvg } from "$lib/server/card"
 import { flatSvg } from "$lib/server/flat"
+import { toPng } from "$lib/server/png"
+import { category, displayName, type ZedExtension } from "$lib/server/zed"
 import { status, zed } from "$lib/tokens"
 
 export interface BadgeOpts {
@@ -10,19 +13,15 @@ export interface BadgeOpts {
   raw: boolean
   logo: boolean
   flat: boolean
-  theme: "dark" | "light" | "auto"
+  theme: "dark" | "light"
   metric: string
-  prefix: string
-  suffix: string
+  desc: string
+  author: boolean
+  category: boolean
 }
 
-const parseTheme = (value: string | null): BadgeOpts["theme"] => {
-  if (value === "light" || value === "auto") {
-    return value
-  }
-
-  return "dark"
-}
+const parseTheme = (value: string | null): BadgeOpts["theme"] =>
+  value === "light" ? "light" : "dark"
 
 export const parseOpts = (url: URL): BadgeOpts => ({
   label: cleanText(url.searchParams.get("label") ?? "") || undefined,
@@ -32,12 +31,13 @@ export const parseOpts = (url: URL): BadgeOpts => ({
   flat: url.searchParams.get("style") === "flat",
   theme: parseTheme(url.searchParams.get("theme")),
   metric: url.searchParams.get("metric") ?? "downloads",
-  prefix: cleanText(url.searchParams.get("prefix") ?? ""),
-  suffix: cleanText(url.searchParams.get("suffix") ?? ""),
+  desc: cleanText(url.searchParams.get("desc") ?? ""),
+  author: url.searchParams.get("author") !== "0",
+  category: url.searchParams.get("category") === "1",
 })
 
 export const stripExt = (file: string) => {
-  for (const ext of [".svg", ".json"]) {
+  for (const ext of [".svg", ".png", ".json"]) {
     if (file.endsWith(ext)) {
       return file.slice(0, -ext.length)
     }
@@ -46,8 +46,43 @@ export const stripExt = (file: string) => {
   return file
 }
 
+export const imageFormat = (file: string): "svg" | "png" =>
+  file.endsWith(".png") ? "png" : "svg"
+
 export const validSubject = (subject: string) =>
   subject.length > 0 && subject.length <= 64
+
+export const extensionCard = (
+  ext: ZedExtension,
+  opts: BadgeOpts,
+): CardProps => {
+  const isVersion = opts.metric === "version"
+  const count = opts.raw
+    ? withCommas(ext.download_count)
+    : humanize(ext.download_count)
+  const value = isVersion ? `v${ext.version}` : count
+  const hideDesc = opts.desc === "0"
+  const rendered =
+    opts.desc && !hideDesc
+      ? template(opts.desc, { downloads: count, version: `v${ext.version}` })
+      : undefined
+
+  return {
+    title: opts.label ?? ext.name,
+    right: value,
+    desc: hideDesc
+      ? undefined
+      : rendered
+        ? "text" in rendered
+          ? rendered.text
+          : undefined
+        : ext.description,
+    descSegments: rendered && "strong" in rendered ? rendered : undefined,
+    meta: opts.author ? ext.authors?.map(displayName).join(", ") : undefined,
+    tag: opts.category ? category(ext) : undefined,
+    theme: opts.theme,
+  }
+}
 
 export const statusSvg = (
   state: "missing" | "unavailable",
@@ -79,6 +114,26 @@ export const svgResponse = (body: string, cacheControl: string) =>
     },
   })
 
+export const imageResponse = async (
+  svg: string,
+  format: "svg" | "png",
+  cacheControl: string,
+) => {
+  if (format === "svg") {
+    return svgResponse(svg, cacheControl)
+  }
+
+  const png = await toPng(svg)
+
+  return new Response(png.slice().buffer, {
+    headers: {
+      "content-type": "image/png",
+      "cache-control": cacheControl,
+      "access-control-allow-origin": "*",
+    },
+  })
+}
+
 export const jsonError = (message: string, statusCode: number) =>
   json(
     { error: message },
@@ -87,17 +142,3 @@ export const jsonError = (message: string, statusCode: number) =>
       headers: { "access-control-allow-origin": "*" },
     },
   )
-
-export const shieldsEndpoint = (
-  label: string,
-  message: string,
-  color: string,
-) =>
-  json({
-    schemaVersion: 1,
-    label,
-    message,
-    color,
-    cacheSeconds: 300,
-    namedLogo: "zedindustries",
-  })

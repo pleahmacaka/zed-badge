@@ -1,0 +1,15 @@
+{
+  "name": "zed-badge-cron",
+  "main": "index.ts",
+  "compatibility_date": "2026-08-01",
+  "triggers": { "crons": ["17 0 * * *"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zed-badge",
+      "database_id": "db562d52-a80e-4531-b74d-6645882adb4b",
+      "migrations_dir": "../migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

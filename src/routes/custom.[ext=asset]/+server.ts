@@ -1,11 +1,12 @@
 import { cleanText } from "$lib/format"
-import { parseOpts, svgResponse } from "$lib/server/badge"
+import { imageResponse, parseOpts } from "$lib/server/badge"
 import { cardSvg } from "$lib/server/card"
 import { cacheHeader } from "$lib/server/env"
 import { flatSvg } from "$lib/server/flat"
 import type { RequestHandler } from "./$types"
 
-export const GET: RequestHandler = ({ url }) => {
+export const GET: RequestHandler = ({ params, url }) => {
+  const format = params.ext === "png" ? "png" : "svg"
   const opts = parseOpts(url)
   const title = opts.label ?? "zed-badge"
   const message = cleanText(url.searchParams.get("message") ?? "")
@@ -14,13 +15,14 @@ export const GET: RequestHandler = ({ url }) => {
   const cacheControl = cacheHeader()
 
   if (opts.flat) {
-    return svgResponse(
+    return imageResponse(
       flatSvg(title, message || "custom badge", opts.color, opts.logo),
+      format,
       cacheControl,
     )
   }
 
-  return svgResponse(
+  return imageResponse(
     cardSvg({
       title,
       right: right || undefined,
@@ -28,6 +30,7 @@ export const GET: RequestHandler = ({ url }) => {
       meta: meta || undefined,
       theme: opts.theme,
     }),
+    format,
     cacheControl,
   )
 }

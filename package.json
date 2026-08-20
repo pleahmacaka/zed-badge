@@ -31,10 +31,13 @@
     "@iconify/svelte": "^5.2.2",
     "@iconify/types": "^2.0.0",
     "@iconify/utils": "^3.1.4",
-    "badge-maker": "^5.0.2"
+    "@resvg/resvg-wasm": "^2.6.2",
+    "badge-maker": "^5.0.2",
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.0",
+    "@cloudflare/workers-types": "^5.20260820.1",
     "@sveltejs/adapter-cloudflare": "^7.2.4",
     "@sveltejs/kit": "^2.63.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",

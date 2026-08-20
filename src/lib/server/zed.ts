@@ -7,7 +7,27 @@ export interface ZedExtension {
   version: string
   description: string
   authors?: string[]
+  provides?: string[]
   download_count: number
+}
+
+const CATEGORIES: [string, string][] = [
+  ["languages", "Language"],
+  ["themes", "Theme"],
+  ["icon-themes", "Icon Theme"],
+  ["language-servers", "LSP"],
+  ["context-servers", "MCP"],
+  ["debug-adapters", "Debugger"],
+  ["agent-servers", "Agent"],
+  ["snippets", "Snippets"],
+  ["slash-commands", "Commands"],
+  ["grammars", "Grammar"],
+]
+
+export const category = (ext: ZedExtension): string | undefined => {
+  const provides = ext.provides ?? []
+
+  return CATEGORIES.find(([key]) => provides.includes(key))?.[1]
 }
 
 export interface AuthorStats {

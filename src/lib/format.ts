@@ -1,5 +1,3 @@
-const NO_LEADING_SPACE = " .,!?;:%)]"
-
 const isPrintable = (c: string) => c >= " " && c !== "<" && c !== ">"
 
 export const humanize = (n: number): string => {
@@ -22,34 +20,33 @@ export const withCommas = (n: number): string => n.toLocaleString("en-US")
 export const cleanText = (s = ""): string =>
   [...s].filter(isPrintable).slice(0, 48).join("")
 
-const fmtPrefix = (prefix: string) => {
-  if (!prefix) {
-    return ""
+export type Rendered =
+  | { text: string }
+  | { prefix: string; strong: string; suffix: string }
+
+const fill = (s: string, values: Record<string, string>) =>
+  Object.entries(values).reduce(
+    (acc, [key, value]) => acc.replaceAll(`{{${key}}}`, value),
+    s,
+  )
+
+export const template = (
+  desc: string,
+  values: Record<string, string>,
+): Rendered => {
+  for (const [key, value] of Object.entries(values)) {
+    const token = `{{${key}}}`
+    const at = desc.indexOf(token)
+    if (at === -1) {
+      continue
+    }
+
+    return {
+      prefix: fill(desc.slice(0, at), values),
+      strong: value,
+      suffix: fill(desc.slice(at + token.length), values),
+    }
   }
 
-  return prefix.endsWith(" ") ? prefix : `${prefix} `
-}
-
-const fmtSuffix = (suffix: string) => {
-  if (!suffix) {
-    return ""
-  }
-
-  return NO_LEADING_SPACE.includes(suffix[0]) ? suffix : ` ${suffix}`
-}
-
-export const wrap = (prefix: string, value: string, suffix: string) => {
-  if (!prefix && !suffix) {
-    return value
-  }
-
-  return `${fmtPrefix(prefix)}${value}${fmtSuffix(suffix)}`.trim()
-}
-
-export const segments = (prefix: string, strong: string, suffix: string) => {
-  if (!prefix && !suffix) {
-    return undefined
-  }
-
-  return { prefix: fmtPrefix(prefix), strong, suffix: fmtSuffix(suffix) }
+  return { text: fill(desc, values) }
 }
