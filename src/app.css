@@ -86,6 +86,25 @@
     }
 }
 
+@layer components {
+    .tooltip:before {
+        z-index: 50;
+        max-width: 14rem;
+        background-color: var(--color-base-100);
+        color: var(--color-base-content);
+        border: 0.0625rem solid var(--color-base-300);
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+
+    .tooltip:after {
+        display: none;
+    }
+}
+
 @layer utilities {
     .label-caps {
         font-family: var(--font-mono);

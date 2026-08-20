@@ -13,8 +13,8 @@
 <div class="mx-auto min-h-screen max-w-4xl px-5 pt-10 pb-20 font-sans text-[0.9375rem] leading-relaxed">
   <header class="mb-1 flex items-center gap-3">
     <Icon icon={zedLogo} class="size-8 flex-none text-primary" />
-    <h1 class="font-serif text-[1.65rem] font-semibold tracking-tight">Zed Extension Badges</h1>
-    <nav class="ml-auto font-mono text-sm">
+    <h1 class="min-w-0 truncate font-serif text-xl font-semibold tracking-tight sm:text-[1.65rem]">Zed Extension Badges</h1>
+    <nav class="ml-auto flex-none font-mono text-sm">
       {#if onDocs}
         <a class="link link-primary no-underline hover:underline" href="/">generator</a>
       {:else}

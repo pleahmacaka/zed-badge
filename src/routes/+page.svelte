@@ -13,6 +13,9 @@
   ]
 
   let mode = $state("extension")
+  let chart = $state(false)
+  let show = $state({ desc: true, author: true, category: false })
+  let format = $state("svg")
   let query = $state("")
   let debounced = $state("")
 
@@ -36,8 +39,7 @@
     raw: "",
     logo: "",
     label: "",
-    prefix: "",
-    suffix: "",
+    desc: "",
   })
 
   type FormKey = keyof typeof form
@@ -45,6 +47,7 @@
   const isAuthor = $derived(mode === "author")
   const isCustom = $derived(mode === "custom")
   const isExtension = $derived(mode === "extension")
+  const isChart = $derived(isExtension && chart)
   const isFlat = $derived(form.style === "flat")
 
   const placeholder = $derived(
@@ -62,6 +65,7 @@
     key: FormKey
     title: string
     placeholder: string
+    help?: string
     show: boolean
   }
 
@@ -73,7 +77,7 @@
         { value: "", label: "Card" },
         { value: "flat", label: "Flat" },
       ],
-      show: true,
+      show: !isChart,
     },
     {
       key: "theme",
@@ -81,7 +85,6 @@
       choices: [
         { value: "", label: "Dark" },
         { value: "light", label: "Light" },
-        { value: "auto", label: "Auto" },
       ],
       show: !isFlat,
     },
@@ -92,7 +95,7 @@
         { value: "", label: "DL" },
         { value: "version", label: "Ver" },
       ],
-      show: isExtension,
+      show: isExtension && !isChart,
     },
     {
       key: "raw",
@@ -116,15 +119,21 @@
 
   const textFields: TextField[] = $derived([
     { key: "label", title: "Label", placeholder: isCustom ? "zed-badge" : "(default)", show: true },
-    { key: "prefix", title: "Before", placeholder: "Thanks for", show: !isCustom },
-    { key: "suffix", title: "After", placeholder: "downloading!", show: !isCustom },
+    {
+      key: "desc",
+      title: "Desc",
+      placeholder: "Thanks for {{downloads}} downloads!",
+      help: "Replaces the description line. Variables: {{downloads}}, {{version}} (extension), {{extensions}} (author). The first variable is rendered bold.",
+      show: !isCustom && !(isExtension && !show.desc),
+    },
   ])
 
   const url = $derived.by(() => {
     const subject = debounced.trim() || placeholder
-    const path = isCustom
-      ? "/custom.svg"
-      : `${isAuthor ? "/author/" : "/extension/"}${encodeURIComponent(subject)}.svg`
+    const base = isCustom
+      ? "/custom"
+      : `${isChart ? "/chart/" : isAuthor ? "/author/" : "/extension/"}${encodeURIComponent(subject)}`
+    const path = `${base}.${format}`
 
     const fields = [...segments, ...textFields]
       .filter(field => field.show)
@@ -134,11 +143,28 @@
     }
 
     const search = new URLSearchParams(fields.filter(([, value]) => value))
+    if (isExtension) {
+      if (!show.desc) {
+        search.set("desc", "0")
+      }
+      if (!show.author) {
+        search.set("author", "0")
+      }
+      if (show.category) {
+        search.set("category", "1")
+      }
+    }
 
     return page.url.origin + path + (search.size ? `?${search}` : "")
   })
 
-  const markdown = $derived(`![Zed ${mode} badge](${url})`)
+  const previewSrc = $derived(
+    `${url}${url.includes("?") ? "&" : "?"}preview=${Date.now()}`,
+  )
+
+  const markdown = $derived(
+    `![Zed ${isChart ? "download chart" : `${mode} badge`}](${url})`,
+  )
 </script>
 
 <svelte:head>
@@ -153,12 +179,12 @@
   Live badges for Zed extensions and their authors, rendered fresh from api.zed.dev.
 </p>
 
-<div class="mt-5 grid grid-cols-[4rem_1fr] gap-3.5 md:grid-cols-[4rem_1fr_16.5rem]">
-  <div class="flex flex-col gap-2" aria-label="badge type">
+<div class="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-[4rem_1fr] md:grid-cols-[4rem_1fr_16.5rem]">
+  <div class="flex gap-2 sm:flex-col" aria-label="badge type">
     {#each modes as m (m.value)}
       <button
         type="button"
-        class="btn h-16 flex-col gap-1 border-base-300 bg-base-100 text-[0.62rem] label-caps
+        class="btn h-16 flex-1 flex-col gap-1 border-base-300 bg-base-100 text-[0.62rem] label-caps sm:flex-none
           {mode === m.value ? 'btn-outline btn-primary' : 'btn-ghost border'}"
         aria-pressed={mode === m.value}
         onclick={() => selectMode(m.value)}
@@ -182,18 +208,37 @@
     <div
       class="flex min-h-60 flex-1 items-center justify-center rounded-box border border-base-300 bg-base-100 p-6 dotgrid"
     >
-      <img class="max-w-full" src={url} alt="badge preview" />
+      <img class="max-w-full" src={previewSrc} alt="badge preview" />
     </div>
   </div>
 
-  <div class="col-span-2 self-start overflow-hidden rounded-box border border-base-300 bg-base-100 md:col-span-1">
+  <div class="self-start rounded-box border border-base-300 bg-base-100 sm:col-span-2 md:col-span-1">
+    {#if isExtension}
+      <OptionRow label="Chart" help="Append the download trend below the badge">
+        <input
+          type="checkbox"
+          class="toggle toggle-primary toggle-sm"
+          aria-label="show download chart"
+          bind:checked={chart}
+        />
+      </OptionRow>
+    {/if}
     {#each segments.filter(s => s.show) as segment (segment.key)}
       <OptionRow label={segment.title}>
         <Segmented bind:value={form[segment.key]} options={segment.choices} />
       </OptionRow>
     {/each}
+    <OptionRow label="Format">
+      <Segmented
+        bind:value={format}
+        options={[
+          { value: "svg", label: "SVG" },
+          { value: "png", label: "PNG" },
+        ]}
+      />
+    </OptionRow>
     {#each textFields.filter(f => f.show) as field (field.key)}
-      <OptionRow label={field.title}>
+      <OptionRow label={field.title} help={field.help}>
         <input
           type="text"
           class="input input-sm w-36 font-mono"
@@ -205,6 +250,32 @@
         />
       </OptionRow>
     {/each}
+    {#if isExtension}
+      <OptionRow label="Desc" help="Show the description line">
+        <input
+          type="checkbox"
+          class="toggle toggle-primary toggle-sm"
+          aria-label="show description"
+          bind:checked={show.desc}
+        />
+      </OptionRow>
+      <OptionRow label="Author" help="Show the author line">
+        <input
+          type="checkbox"
+          class="toggle toggle-primary toggle-sm"
+          aria-label="show author"
+          bind:checked={show.author}
+        />
+      </OptionRow>
+      <OptionRow label="Category" help="Show the category tag">
+        <input
+          type="checkbox"
+          class="toggle toggle-primary toggle-sm"
+          aria-label="show category"
+          bind:checked={show.category}
+        />
+      </OptionRow>
+    {/if}
   </div>
 </div>
 
