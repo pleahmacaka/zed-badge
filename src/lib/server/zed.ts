@@ -134,7 +134,7 @@ interface Index {
   partial: boolean
 }
 
-const fetchIndex = async (): Promise<Index | "error"> => {
+export const fetchIndex = async (): Promise<Index | "error"> => {
   const queries = ["", ...PROVIDES.map(p => `&provides=${p}`)]
   const pages = await Promise.all(
     queries.map(q =>

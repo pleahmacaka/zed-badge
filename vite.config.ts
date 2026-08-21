@@ -18,6 +18,8 @@ const ICONS: Record<string, [IconifyJSON, string]> = {
   pencilIcon: [lucide, "pencil"],
   chartIcon: [lucide, "chart-line"],
   helpIcon: [lucide, "circle-help"],
+  copyIcon: [lucide, "copy"],
+  checkIcon: [lucide, "check"],
 }
 
 const iconData = (): Plugin => ({

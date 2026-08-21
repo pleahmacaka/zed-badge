@@ -1,6 +1,8 @@
 export {
   blocksIcon,
   chartIcon,
+  checkIcon,
+  copyIcon,
   downloadIcon,
   githubIcon,
   helpIcon,

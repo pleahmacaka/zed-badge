@@ -14,4 +14,6 @@ declare module "virtual:icon-data" {
   export const pencilIcon: IconifyIcon
   export const chartIcon: IconifyIcon
   export const helpIcon: IconifyIcon
+  export const copyIcon: IconifyIcon
+  export const checkIcon: IconifyIcon
 }

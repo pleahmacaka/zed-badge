@@ -113,6 +113,42 @@
         font-weight: 700;
     }
 
+    .sweep::before,
+    .sweep::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .sweep::before {
+        inset: 0;
+        border-radius: inherit;
+        background-color: color-mix(in oklab, var(--color-base-100) 72%, transparent);
+    }
+
+    .sweep::after {
+        top: -30%;
+        bottom: -30%;
+        left: 0;
+        width: 22%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in oklab, var(--color-base-content) 30%, transparent),
+            transparent
+        );
+        animation: sweep 0.7s linear infinite;
+    }
+
+    @keyframes sweep {
+        from {
+            transform: rotate(14deg) translateX(-150%);
+        }
+        to {
+            transform: rotate(14deg) translateX(480%);
+        }
+    }
+
     .dotgrid {
         background-image: radial-gradient(
             color-mix(in oklab, var(--color-base-content) 13%, transparent) 0.0625rem,
@@ -120,4 +156,14 @@
         );
         background-size: 1.125rem 1.125rem;
     }
+}
+
+* {
+  @apply appearance-none outline-none;
+
+  @apply transition-all duration-75 ease-in-out;
+}
+
+*:focus {
+  @apply appearance-none outline-none;
 }

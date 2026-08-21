@@ -25,17 +25,19 @@
 
   {@render children()}
 
-  <footer class="mt-16 border-t border-base-300 pt-4 text-sm text-secondary">
-    <p class="text-center text-sm">
-      Data: <a class="link link-primary" href="https://api.zed.dev/extensions">api.zed.dev</a>.
+  <footer class="mt-16 border-t border-base-300 pt-4 text-xs text-secondary/70">
+    <p class="text-center">
+      Data: <a class="link" href="https://api.zed.dev/extensions">api.zed.dev</a>.
       Unofficial project, not affiliated with Zed Industries, Inc.
-      Logo and fonts per the <a class="link link-primary" href="https://zed.dev/brand">Zed brand guidelines</a>.
+    </p>
+    <p class="text-center">
+      Logo and fonts per the <a class="link" href="https://zed.dev/brand">Zed brand guidelines</a>.
     </p>
     <div class="mt-3 flex items-center justify-center gap-3">
       <a class="transition-colors hover:text-primary" href={REPO} aria-label="GitHub repository">
         <Icon icon={githubIcon} class="size-5" />
       </a>
-      <span class="font-mono text-xs">MIT License</span>
+      <span class="font-mono">MIT License</span>
     </div>
   </footer>
 </div>
