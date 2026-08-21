@@ -7,6 +7,7 @@ export {
   githubIcon,
   helpIcon,
   pencilIcon,
+  shareIcon,
   userIcon,
   zedLogo,
 } from "virtual:icon-data"

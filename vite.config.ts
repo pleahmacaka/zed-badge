@@ -19,6 +19,7 @@ const ICONS: Record<string, [IconifyJSON, string]> = {
   chartIcon: [lucide, "chart-line"],
   helpIcon: [lucide, "circle-help"],
   copyIcon: [lucide, "copy"],
+  shareIcon: [lucide, "share-2"],
   checkIcon: [lucide, "check"],
 }
 

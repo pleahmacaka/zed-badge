@@ -1,11 +1,12 @@
 <script lang="ts">
   import Icon from "@iconify/svelte"
+  import { onMount } from "svelte"
   import { page } from "$app/state"
   import CopyBlock from "$lib/components/CopyBlock.svelte"
   import OptionRow from "$lib/components/OptionRow.svelte"
   import Segmented from "$lib/components/Segmented.svelte"
   import Seo from "$lib/components/Seo.svelte"
-  import { blocksIcon, pencilIcon, userIcon } from "$lib/icons"
+  import { blocksIcon, checkIcon, pencilIcon, shareIcon, userIcon } from "$lib/icons"
 
   const modes = [
     { value: "extension", label: "Ext", icon: blocksIcon },
@@ -272,6 +273,72 @@
     return page.url.origin + path + (search.size ? `?${search}` : "")
   })
 
+  const shareUrl = $derived.by(() => {
+    const params = new URLSearchParams(new URL(url).search)
+    if (mode !== "extension") {
+      params.set("mode", mode)
+    }
+    params.set("id", subject)
+    if (chart) {
+      params.set("chart", "1")
+    }
+    if (format !== "svg") {
+      params.set("format", format)
+    }
+    if (!show.link) {
+      params.set("link", "0")
+    } else if (link.trim()) {
+      params.set("link", link.trim())
+    }
+    params.delete("message")
+
+    return `${page.url.origin}/${params.size ? `?${params}` : ""}`
+  })
+
+  const HEX_LENGTHS = [3, 4, 6, 8]
+
+  const withHash = (value: string) =>
+    HEX_LENGTHS.includes(value.length) &&
+    [...value].every(c => "0123456789abcdefABCDEF".includes(c))
+      ? `#${value}`
+      : value
+
+  let shared = $state(false)
+
+  const share = async () => {
+    await navigator.clipboard.writeText(shareUrl)
+    shared = true
+    setTimeout(() => (shared = false), 1200)
+  }
+
+  onMount(() => {
+    const params = page.url.searchParams
+
+    mode = params.get("mode") ?? "extension"
+    query = params.get("id") ?? ""
+    debounced = query
+    chart = params.get("chart") === "1"
+    format = params.get("format") === "png" ? "png" : "svg"
+
+    for (const key of Object.keys(form) as FormKey[]) {
+      const value = params.get(key) ?? ""
+      form[key] =
+        key === "color" || key === "labelColor" ? withHash(value) : value
+    }
+
+    show.desc = form.desc !== "0"
+    show.author = params.get("author") !== "0"
+    show.category = params.get("category") === "1"
+    if (!show.desc) {
+      form.desc = ""
+    }
+
+    const shared = params.get("link")
+    show.link = shared !== "0"
+    link = shared && shared !== "0" ? shared : ""
+
+  })
+
   const previewSrc = $derived(
     `${url}${url.includes("?") ? "&" : "?"}preview=${Date.now()}`,
   )
@@ -319,12 +386,14 @@
   Live badges for Zed extensions and their authors, rendered fresh from api.zed.dev.
 </p>
 
-<div class="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-[4rem_1fr] md:grid-cols-[4rem_1fr_16.5rem]">
-  <div class="flex gap-2 sm:flex-col" aria-label="badge type">
+<div class="mt-5 grid grid-cols-1 gap-3.5 md:grid-cols-[1fr_16.5rem]">
+  <div class="flex min-w-0 flex-col gap-3">
+    <div class="grid grid-cols-[4rem_1fr] gap-3.5">
+  <div class="flex flex-col gap-2" aria-label="badge type">
     {#each modes as m (m.value)}
       <button
         type="button"
-        class="btn h-16 flex-1 flex-col gap-1 border-base-300 bg-base-100 text-[0.62rem] label-caps sm:flex-none
+        class="btn h-16 flex-col gap-1 border-base-300 bg-base-100 text-[0.62rem] label-caps
           {mode === m.value ? 'btn-outline btn-primary' : 'btn-ghost border'}"
         aria-pressed={mode === m.value}
         onclick={() => selectMode(m.value)}
@@ -333,6 +402,15 @@
         {m.label}
       </button>
     {/each}
+    <button
+      type="button"
+      class="btn btn-ghost mt-auto h-16 flex-col gap-1 border border-base-300 bg-base-100 text-[0.62rem] text-secondary label-caps"
+      title="Copy a link to these settings"
+      onclick={share}
+    >
+      <Icon icon={shared ? checkIcon : shareIcon} class="size-5" />
+      {shared ? "Copied" : "Share"}
+    </button>
   </div>
 
   <div class="flex min-w-0 flex-col gap-3">
@@ -396,11 +474,17 @@
         onerror={settle}
       />
     </div>
+  </div>
+    </div>
     <CopyBlock title="Markdown" text={markdown} />
     <CopyBlock title="URL" text={url} />
+    <small class="text-xs text-secondary/70">
+      Badges refresh within about 5 minutes. See
+      <a class="link" href="/docs">docs</a> for every endpoint and option.
+    </small>
   </div>
 
-  <div class="self-start rounded-box border border-base-300 bg-base-100 sm:col-span-2 md:col-span-1">
+  <div class="self-start rounded-box border border-base-300 bg-base-100">
     {#if isExtension}
       <OptionRow label="Chart" help="Append the download trend below the badge (card style only)">
         <input
@@ -442,7 +526,7 @@
               {#each field.presets ?? [] as preset (preset)}
                 <button
                   type="button"
-                  class="size-4 rounded-full border border-base-300"
+                  class="size-4 cursor-pointer rounded-full border border-base-300"
                   style="background-color: {preset}"
                   title={preset}
                   aria-label={preset}
@@ -513,7 +597,3 @@
   </div>
 </div>
 
-<small class="mt-2 block text-sm text-secondary">
-  Badges refresh within about 5 minutes. See
-  <a class="link link-primary" href="/docs">docs</a> for every endpoint and option.
-</small>
