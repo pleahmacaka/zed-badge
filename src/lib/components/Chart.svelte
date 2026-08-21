@@ -98,14 +98,26 @@
       (_, i) => floor + step * (i + 1),
     ),
   )
-  const dateTicks = $derived(
-    Array.from({ length: hasData ? TICKS : 0 }, (_, i) => {
-      const index = Math.round(((points.length - 1) * i) / (TICKS - 1))
-      const anchor = i === 0 ? "start" : i === TICKS - 1 ? "end" : "middle"
+  const dateTicks = $derived.by(() => {
+    if (!hasData) {
+      return []
+    }
 
-      return { index, anchor, label: dateLabel(points[index].date) }
-    }),
-  )
+    const count = Math.min(TICKS, points.length)
+    const indices = [
+      ...new Set(
+        Array.from({ length: count }, (_, i) =>
+          Math.round(((points.length - 1) * i) / Math.max(count - 1, 1)),
+        ),
+      ),
+    ]
+
+    return indices.map((index, i) => ({
+      index,
+      anchor: i === 0 ? "start" : i === indices.length - 1 ? "end" : "middle",
+      label: dateLabel(points[index].date),
+    }))
+  })
 
   const last = $derived(points.at(-1))
   const label = $derived(
