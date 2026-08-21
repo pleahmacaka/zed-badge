@@ -25,9 +25,8 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 
   const opts = parseOpts(url)
   const cacheControl = cacheHeader()
-  const db = platform?.env?.DB
-  if (!db) {
-    return imageResponse(
+  const unavailable = () =>
+    imageResponse(
       cardSvg({
         title: opts.label ?? id,
         desc: "history unavailable",
@@ -37,9 +36,16 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
       format,
       "no-cache",
     )
+
+  const db = platform?.env?.DB
+  if (!db) {
+    return unavailable()
   }
 
   const [ext, points] = await Promise.all([lookup(id), history(db, id)])
+  if (points === null) {
+    return unavailable()
+  }
   if (ext === "error") {
     return imageResponse(
       statusSvg("unavailable", opts, id, id),

@@ -28,12 +28,16 @@ export const downsample = (points: HistoryPoint[]): HistoryPoint[] => {
 export const history = async (
   db: D1Database,
   id: string,
-): Promise<HistoryPoint[]> => {
-  const rows = await drizzle(db)
-    .select({ date: snapshots.date, downloads: snapshots.downloads })
-    .from(snapshots)
-    .where(eq(snapshots.extensionId, id))
-    .orderBy(asc(snapshots.date))
+): Promise<HistoryPoint[] | null> => {
+  try {
+    const rows = await drizzle(db)
+      .select({ date: snapshots.date, downloads: snapshots.downloads })
+      .from(snapshots)
+      .where(eq(snapshots.extensionId, id))
+      .orderBy(asc(snapshots.date))
 
-  return downsample(rows)
+    return downsample(rows)
+  } catch {
+    return null
+  }
 }
