@@ -4,6 +4,7 @@
   import CopyBlock from "$lib/components/CopyBlock.svelte"
   import OptionRow from "$lib/components/OptionRow.svelte"
   import Segmented from "$lib/components/Segmented.svelte"
+  import Seo from "$lib/components/Seo.svelte"
   import { blocksIcon, pencilIcon, userIcon } from "$lib/icons"
 
   const modes = [
@@ -167,13 +168,11 @@
   )
 </script>
 
-<svelte:head>
-  <title>Zed Extension Badges</title>
-  <meta
-    name="description"
-    content="Live SVG badges for Zed extensions and their authors, rendered from api.zed.dev"
-  />
-</svelte:head>
+<Seo
+  title="Zed Extension Badges"
+  description="Live SVG badges for Zed extensions and their authors, rendered from api.zed.dev"
+  path="/"
+/>
 
 <p class="mt-1 mb-7 font-serif italic text-secondary">
   Live badges for Zed extensions and their authors, rendered fresh from api.zed.dev.

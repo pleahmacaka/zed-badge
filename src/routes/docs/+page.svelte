@@ -1,5 +1,6 @@
 <script lang="ts">
   import Param from "$lib/components/Param.svelte"
+  import Seo from "$lib/components/Seo.svelte"
 
   let id = $state("windows-batch")
   let name = $state("PleahMaCaka")
@@ -8,13 +9,11 @@
   const namePath = $derived(encodeURIComponent(name.trim() || "PleahMaCaka"))
 </script>
 
-<svelte:head>
-  <title>Docs, Zed Extension Badges</title>
-  <meta
-    name="description"
-    content="Every endpoint and query option for Zed extension badges and download charts"
-  />
-</svelte:head>
+<Seo
+  title="Docs, Zed Extension Badges"
+  description="Every endpoint and query option for Zed extension badges and download charts"
+  path="/docs"
+/>
 
 {#snippet heading(text: string)}
   <h2 class="mt-12 mb-3 border-b border-base-300 pb-2 text-lg font-semibold">
