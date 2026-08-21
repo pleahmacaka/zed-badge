@@ -12,11 +12,12 @@ export const flatSvg = (
   message: string,
   color: string,
   withLogo = true,
+  labelColor = "black",
 ): string =>
   makeBadge({
     label,
     message,
     color,
-    labelColor: "black",
+    labelColor,
     ...(withLogo ? { logoBase64: logo } : {}),
   })

@@ -76,7 +76,13 @@ export const GET: RequestHandler = async ({ params, url }) => {
       : `${count} downloads`
 
     return imageResponse(
-      flatSvg(opts.label ?? stats.name, message, opts.color, opts.logo),
+      flatSvg(
+        opts.label ?? stats.name,
+        message,
+        opts.color,
+        opts.logo,
+        opts.labelColor,
+      ),
       format,
       cacheControl,
     )

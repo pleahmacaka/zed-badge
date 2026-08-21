@@ -126,7 +126,8 @@
       <tr><td class="whitespace-nowrap"><code>metric=version</code></td><td>version instead of downloads (extension only)</td></tr>
       <tr><td class="whitespace-nowrap"><code>raw=1</code></td><td>full count with commas (1,234) instead of 1.2k or 1.2M</td></tr>
       <tr><td class="whitespace-nowrap"><code>color=</code></td><td>flat badge value color (default Zed brand blue)</td></tr>
-      <tr><td class="whitespace-nowrap"><code>logo=0</code></td><td>remove the logo (flat only)</td></tr>
+      <tr><td class="whitespace-nowrap"><code>labelColor=</code></td><td>flat badge label color, name or hex (default black; <code>gray</code> matches shields.io)</td></tr>
+      <tr><td class="whitespace-nowrap"><code>logo=0</code></td><td>remove the logo (flat only); the default downloads label becomes <code>zed</code> so the badge stays identifiable</td></tr>
     </tbody>
   </table>
 </div>

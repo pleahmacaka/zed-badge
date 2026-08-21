@@ -10,6 +10,7 @@ import { status, zed } from "$lib/tokens"
 export interface BadgeOpts {
   label?: string
   color: string
+  labelColor: string
   raw: boolean
   logo: boolean
   flat: boolean
@@ -26,6 +27,7 @@ const parseTheme = (value: string | null): BadgeOpts["theme"] =>
 export const parseOpts = (url: URL): BadgeOpts => ({
   label: cleanText(url.searchParams.get("label") ?? "") || undefined,
   color: url.searchParams.get("color") || zed.blue,
+  labelColor: url.searchParams.get("labelColor") || "black",
   raw: url.searchParams.get("raw") === "1",
   logo: url.searchParams.get("logo") !== "0",
   flat: url.searchParams.get("style") === "flat",
@@ -94,7 +96,13 @@ export const statusSvg = (
   const color = state === "unavailable" ? status.unavailable : status.notFound
 
   if (opts.flat) {
-    return flatSvg(opts.label ?? flatLabel, message, color, opts.logo)
+    return flatSvg(
+      opts.label ?? flatLabel,
+      message,
+      color,
+      opts.logo,
+      opts.labelColor,
+    )
   }
 
   return cardSvg({

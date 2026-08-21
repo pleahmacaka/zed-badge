@@ -16,7 +16,13 @@ export const GET: RequestHandler = ({ params, url }) => {
 
   if (opts.flat) {
     return imageResponse(
-      flatSvg(title, message || "custom badge", opts.color, opts.logo),
+      flatSvg(
+        title,
+        message || "custom badge",
+        opts.color,
+        opts.logo,
+        opts.labelColor,
+      ),
       format,
       cacheControl,
     )

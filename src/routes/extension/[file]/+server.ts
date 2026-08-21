@@ -69,7 +69,9 @@ export const GET: RequestHandler = async ({ params, url }) => {
     : undefined
 
   if (opts.flat) {
-    const label = opts.label ?? (isVersion ? "zed extension" : "downloads")
+    const label =
+      opts.label ??
+      (isVersion ? "zed extension" : opts.logo ? "downloads" : "zed")
     const message = rendered
       ? "text" in rendered
         ? rendered.text
@@ -77,7 +79,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       : value
 
     return imageResponse(
-      flatSvg(label, message, opts.color, opts.logo),
+      flatSvg(label, message, opts.color, opts.logo, opts.labelColor),
       format,
       cacheControl,
     )
